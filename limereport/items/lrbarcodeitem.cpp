@@ -108,7 +108,9 @@ void BarcodeItem::paint(QPainter *ppainter, const QStyleOptionGraphicsItem *opti
         break;
     }
 
-    bc.render(*ppainter,bcRect);
+    bc.render(*ppainter, bcRect,
+              m_ignoreAspectRatio ? Zint::QZint::IgnoreAspectRatio
+                                  : Zint::QZint::KeepAspectRatio);
     ppainter->restore();
     ItemDesignIntf::paint(ppainter,option,widget);
 }
@@ -351,6 +353,19 @@ void BarcodeItem::setHideIfEmpty(bool hideIfEmpty)
     }
 }
 
+bool BarcodeItem::ignoreAspectRatio() const
+{
+    return m_ignoreAspectRatio;
+}
+
+void BarcodeItem::setIgnoreAspectRatio(bool ignoreAspectRatio)
+{
+    if (m_ignoreAspectRatio != ignoreAspectRatio){
+        m_ignoreAspectRatio = ignoreAspectRatio;
+        notify("ignoreAspectRatio",!m_ignoreAspectRatio, m_ignoreAspectRatio);
+    }
+}
+
 bool BarcodeItem::isEmpty() const
 {
     return m_content.isEmpty();
@@ -362,12 +377,15 @@ QWidget *BarcodeItem::defaultEditor()
     auto re = reportEditor();
     if(re)
         dw = dynamic_cast<ReportDesignWindow*>(re->getDesignerWindow());
-    qDebug() << re << dw;
     auto editor =
         new TextItemPropertyEditor(QApplication::activeWindow(),
                                              dw ? dw->barcodeVariables() : QStringList{});
     editor->setText(m_content);
     editor->setAttribute(Qt::WA_DeleteOnClose);
+    connect(editor,&QDialog::accepted,this, [this, editor]()
+            {
+        setContent(editor->text());
+    });
     return editor;
 }
 

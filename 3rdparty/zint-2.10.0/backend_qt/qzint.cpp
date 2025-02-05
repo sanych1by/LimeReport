@@ -454,7 +454,6 @@ namespace Zint {
         struct zint_vector_circle *circle;
         struct zint_vector_string *string;
 
-        (void)mode; /* Not currently used */
 
         encode();
 
@@ -470,30 +469,29 @@ namespace Zint {
         }
 
         painter.setClipRect(paintRect, Qt::IntersectClip);
-
+        //painter.fillRect(paintRect, QBrush(QColor(0,255,0,255)));
         qreal xtr = paintRect.x();
         qreal ytr = paintRect.y();
-        qreal scale;
+        qreal xscale = 1, yscale = 1;
 
         qreal gwidth = m_zintSymbol->vector->width;
         qreal gheight = m_zintSymbol->vector->height;
 
         if (m_rotate_angle == 90 || m_rotate_angle == 270) {
-            if (paintRect.width() / gheight < paintRect.height() / gwidth) {
-                scale = paintRect.width() / gheight;
-            } else {
-                scale = paintRect.height() / gwidth;
-            }
+                xscale = paintRect.width() / gheight;
+                yscale = paintRect.height() / gwidth;
         } else {
-            if (paintRect.width() / gwidth < paintRect.height() / gheight) {
-                scale = paintRect.width() / gwidth;
-            } else {
-                scale = paintRect.height() / gheight;
-            }
+                xscale = paintRect.width() / gwidth;
+                yscale = paintRect.height() / gheight;
         }
-
-        xtr += (qreal) (paintRect.width() - gwidth * scale) / 2.0;
-        ytr += (qreal) (paintRect.height() - gheight * scale) / 2.0;
+        if(mode == KeepAspectRatio) {
+            if(xscale > yscale)
+                xscale = yscale;
+            else
+                yscale = xscale;
+        }
+        xtr += (qreal) (paintRect.width() - gwidth * xscale) / 2.0;
+        ytr += (qreal) (paintRect.height() - gheight * yscale) / 2.0;
 
         if (m_rotate_angle) {
             painter.translate(paintRect.width() / 2.0, paintRect.height() / 2.0); // Need to rotate around centre
@@ -502,14 +500,13 @@ namespace Zint {
         }
 
         painter.translate(xtr, ytr);
-        painter.scale(scale, scale);
+        painter.scale(xscale, yscale);
 
         QBrush bgBrush(m_bgColor);
         painter.fillRect(QRectF(0, 0, gwidth, gheight), bgBrush);
 
         //Red square for diagnostics
         //painter.fillRect(QRect(0, 0, m_zintSymbol->vector->width, m_zintSymbol->vector->height), QBrush(QColor(255,0,0,255)));
-
         // Plot rectangles
         rect = m_zintSymbol->vector->rectangles;
         if (rect) {

@@ -53,6 +53,7 @@ class BarcodeItem : public LimeReport::ContentItemDesignIntf {
     Q_PROPERTY(bool hideText READ hideText WRITE setHideText)
     Q_PROPERTY(int option3 READ option3 WRITE setOption3)
     Q_PROPERTY(bool hideIfEmpty READ hideIfEmpty WRITE setHideIfEmpty)
+    Q_PROPERTY(bool ignoreAspectRatio READ ignoreAspectRatio WRITE setIgnoreAspectRatio)
 public:
     enum BarcodeType {
         CODE11          =1,
@@ -202,6 +203,8 @@ public:
     void setOption3(int option3);
     bool hideIfEmpty() const;
     void setHideIfEmpty(bool hideIfEmpty);
+    bool ignoreAspectRatio() const;
+    void setIgnoreAspectRatio(bool ignoreAspectRatio);
     bool isEmpty() const;
     QWidget * defaultEditor();
 private:
@@ -225,6 +228,7 @@ private:
     bool m_hideText;
     int m_option3;
     bool m_hideIfEmpty;
+    bool m_ignoreAspectRatio;
 };
 
 }
