@@ -69,6 +69,7 @@ void BarcodeItem::paint(QPainter *ppainter, const QStyleOptionGraphicsItem *opti
     Zint::QZint bc;
     if (itemMode() & DesignMode) bc.setText(m_designTestValue);
     else bc.setText(m_content);
+    qDebug() << "paint barcode" << m_content << m_designTestValue;
     if(m_escapeMode)
         bc.setInputMode(m_inputMode | ESCAPE_MODE);
     else
