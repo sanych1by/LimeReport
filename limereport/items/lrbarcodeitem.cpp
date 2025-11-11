@@ -73,6 +73,8 @@ void BarcodeItem::paint(QPainter *ppainter, const QStyleOptionGraphicsItem *opti
         bc.setInputMode(m_inputMode | ESCAPE_MODE);
     else
         bc.setInputMode(m_inputMode);
+    if(m_inputMode == GS1_INPUT_MODE)
+        bc.setGSSep(true);
     bc.setSymbol(m_barcodeType);
     bc.setWhitespace(m_whitespace);
     bc.setFgColor(m_foregroundColor);
